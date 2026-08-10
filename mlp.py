@@ -1,3 +1,15 @@
+"""
+mlp.py
+
+A from-scratch implementation of a Multilayer Perceptron (MLP).
+
+Supports configurable layer sizes, forward propagation, and (optionally)
+backpropagation for training via gradient descent.
+
+Author:         Eli DeWitt
+Created:        2026-08-10
+"""
+
 import numpy as np
 
 class MLP:
