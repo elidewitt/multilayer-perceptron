@@ -18,16 +18,15 @@ class MLP:
         self.layer_count = len(layer_dims)
 
         if activation=="relu":
-            self._activation = lambda x: x * (x > 0)
-            self._d_activation = lambda x: (x > 0)
+            self._activation = self._relu
+            self._d_activation = self._d_relu
         else:
-            self._activation = lambda x: x
-            self._d_activation = lambda: 1
+            self._activation = self._identity
+            self._d_activation = self._d_identity
 
         if final_activation=="softmax":
-            self._final_activation = lambda x: np.exp(x - np.max(x)) / np.sum(np.exp(x - np.max(x)))
-            self._d_final_activation = lambda x: self._final_activation(x) * (1 - self._final_activation(x))
-
+            self._final_activation = self._softmax
+            self._d_final_activation = self._d_softmax
 
         self._x = [np.zeros([]) for i in self.layer_dims] # list of layers before activation
         self._z = [np.zeros([]) for i in self.layer_dims] # list of layers after activation
@@ -37,6 +36,37 @@ class MLP:
         self._w = [np.random.rand(self.layer_dims[i + 1], self.layer_dims[i]) - 0.5 for i in range(self.layer_count - 1)]
         self._b = [np.zeros((self.layer_dims[i + 1])) for i in range(self.layer_count - 1)]
 
+    # ---- activation functions ----
+
+    def _relu(self, x):
+        return x * (x > 0)
+
+    def _d_relu(self, x, g):
+        return (x > 0) * g
+
+    def _identity(self, x):
+        return x
+
+    def _d_identity(self, x, g):
+        return g
+
+    def _sigmoid(self, x):
+        return 1 / (1 + np.exp(-x))
+
+    def _d_sigmoid(self, x, g):
+        s = self._sigmoid(x)
+        return s * (1 - s) * g
+
+    def _softmax(self, x):
+        e = np.exp(x - np.max(x))
+        return e / np.sum(e)
+
+    def _d_softmax(self, x, g):
+        s = self._softmax(x)
+        return s * g - s * np.dot(s, g)
+
+    # ---- forward prop algorithm ----
+
     def forward_prop(self, input : list):
 
         self._x[0] = np.array(input)
@@ -45,8 +75,7 @@ class MLP:
             self._z[i] = self._activation(self._x[i])
             self._x[i+1] = self._w[i] @ self._z[i] + self._b[i]
 
-        # TODO: softmax last layer
-        self._z[-1] = self._x[-1] 
+        self._z[-1] = self._final_activation(self._x[-1])
         return self._z[-1]
 
 
