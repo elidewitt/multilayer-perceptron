@@ -33,7 +33,17 @@ class MLP:
         self._b = [np.zeros((self.layer_dims[i])) for i in range(self.layer_count - 1)]
 
     def forward_prop(self, input : list):
-        return None
+
+        self._x[0] = np.array(input)
+
+        for i in range(self.layer_count - 1):
+            self._z[i] = self._activation(self._x[i])
+            self._x[i+1] = self._w[i] @ self._z[i] # + self._b[i]
+
+        # TODO: softmax last layer
+        self._z[-1] = self._x[-1] 
+        return self._z[-1]
+
 
     def backward_prop(self, err : list):
         return None
