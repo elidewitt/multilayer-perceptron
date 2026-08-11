@@ -30,7 +30,7 @@ class MLP:
         # randomize all weights and biases
         # TODO: Optimize choices for weights (may depend on acticvation)
         self._w = [np.random.rand(self.layer_dims[i + 1], self.layer_dims[i]) - 0.5 for i in range(self.layer_count - 1)]
-        self._b = [np.zeros((self.layer_dims[i])) for i in range(self.layer_count - 1)]
+        self._b = [np.zeros((self.layer_dims[i + 1])) for i in range(self.layer_count - 1)]
 
     def forward_prop(self, input : list):
 
@@ -38,7 +38,7 @@ class MLP:
 
         for i in range(self.layer_count - 1):
             self._z[i] = self._activation(self._x[i])
-            self._x[i+1] = self._w[i] @ self._z[i] # + self._b[i]
+            self._x[i+1] = self._w[i] @ self._z[i] + self._b[i]
 
         # TODO: softmax last layer
         self._z[-1] = self._x[-1] 
