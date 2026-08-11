@@ -13,7 +13,7 @@ Created:        2026-08-10
 import numpy as np
 
 class MLP:
-    def __init__(self, layer_dims : list, activation="relu"):
+    def __init__(self, layer_dims : list, activation="relu", final_activation="softmax"):
         self.layer_dims = layer_dims
         self.layer_count = len(layer_dims)
 
@@ -23,6 +23,11 @@ class MLP:
         else:
             self._activation = lambda x: x
             self._d_activation = lambda: 1
+
+        if final_activation=="softmax":
+            self._final_activation = lambda x: np.exp(x - np.max(x)) / np.sum(np.exp(x - np.max(x)))
+            self._d_final_activation = lambda x: self._final_activation(x) * (1 - self._final_activation(x))
+
 
         self._x = [np.zeros([]) for i in self.layer_dims] # list of layers before activation
         self._z = [np.zeros([]) for i in self.layer_dims] # list of layers after activation
