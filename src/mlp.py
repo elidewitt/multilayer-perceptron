@@ -78,6 +78,22 @@ class MLP:
         self._z[-1] = self._final_activation(self._x[-1])
         return self._z[-1]
 
+    # ---- backward prop algorithm ----
 
-    def backward_prop(self, err : list):
-        return None
+    def backward_prop(self, target : list):
+
+        err = self._z[-1] - np.array(target)
+
+        dx = [np.zeros([]) for i in self._x]
+        dw = [np.zeros([]) for i in self._w]
+        db = [np.zeros([]) for i in self._b]
+
+        dx[-1] = self._d_final_activation(self._x[-1], err)
+
+        for i in reversed(range(self.layer_count - 1)):
+            dw[i] = np.outer(dx[i+1], self._z[i])
+            db[i] = dx[i+1]
+            dx[i] = self._d_activation(self._x[i], self._w[i].T @ dx[i+1])
+
+        return dw, db
+
